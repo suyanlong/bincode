@@ -101,9 +101,9 @@ fn test_container_limits() {
     // for this test we'll create a malformed package of a lot of bytes
     let test_cases = &[
         // u64::max_value(), should overflow
-        bincode::encode_to_vec(u64::max_value(), Configuration::standard()).unwrap(),
+        bincode::encode_to_vec(u32::max_value(), Configuration::standard()).unwrap(),
         // A high value which doesn't overflow, but exceeds the decode limit
-        bincode::encode_to_vec(DECODE_LIMIT as u64, Configuration::standard()).unwrap(),
+        bincode::encode_to_vec(DECODE_LIMIT as u32, Configuration::standard()).unwrap(),
     ];
 
     fn validate_fail<T: Decode + core::fmt::Debug>(slice: &[u8]) {

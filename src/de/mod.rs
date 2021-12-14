@@ -188,5 +188,5 @@ pub(crate) fn decode_option_variant<D: Decoder>(
 /// Decodes the length of any slice, container, etc from the decoder
 #[inline]
 pub(crate) fn decode_slice_len<D: Decoder>(decoder: D) -> Result<usize, DecodeError> {
-    u64::decode(decoder).map(|v| v as usize)
+    u32::decode(decoder).map(|v| v as usize)
 }

@@ -259,6 +259,22 @@ impl<const N: usize> InternalLimitConfig for Limit<N> {
     const LIMIT: Option<usize> = Some(N);
 }
 
+// pub trait Len {
+//     type S;
+// }
+
+// #[doc(hidden)]
+// #[derive(Copy, Clone)]
+// pub struct U32 {}
+// pub struct U64 {}
+//
+// impl Len for U32 {
+//     type S = u32;
+// }
+// impl Len for U64 {
+//     type S = u64;
+// }
+
 mod internal {
     use super::Configuration;
 
