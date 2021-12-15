@@ -250,8 +250,17 @@ impl<O: Options> SizeChecker<O> {
     }
 
     fn add_len(&mut self, len: usize) -> Result<()> {
-        let bytes = O::IntEncoding::len_size(len);
-        self.add_raw(bytes)
+        // let bytes = O::IntEncoding::len_size(len);
+        if len > u32::max_value() as usize {
+            Err(Box::new(ErrorKind::Custom(format!(
+                "Invalid size {}: sizes must fit in a u32 (0 to {})",
+                len,
+                u32::max_value()
+            ))))
+        } else {
+            let bytes = O::IntEncoding::u32_size(len as u32);
+            self.add_raw(bytes)
+        }
     }
 }
 

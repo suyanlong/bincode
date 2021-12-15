@@ -31,7 +31,16 @@ pub trait IntEncoding {
         ser: &mut ::ser::Serializer<W, O>,
         len: usize,
     ) -> Result<()> {
-        Self::serialize_u64(ser, len as u64)
+        if len > u32::max_value() as usize {
+            Err(Box::new(ErrorKind::Custom(format!(
+                "Invalid size {}: sizes must fit in a u32 (0 to {})",
+                len,
+                u32::max_value()
+            ))))
+        } else {
+            // Self::serialize_u64(ser, len as u64)
+            Self::serialize_u32(ser, len as u32)
+        }
     }
 
     fn serialize_u16<W: Write, O: Options>(
@@ -69,7 +78,8 @@ pub trait IntEncoding {
     fn deserialize_len<'de, R: BincodeRead<'de>, O: Options>(
         de: &mut ::de::Deserializer<R, O>,
     ) -> Result<usize> {
-        Self::deserialize_u64(de).and_then(cast_u64_to_usize)
+        // Self::deserialize_u64(de).and_then(cast_u64_to_usize)
+        Self::deserialize_u32(de).and_then(|val| Ok(val as usize))
     }
 
     fn deserialize_u16<'de, R: BincodeRead<'de>, O: Options>(

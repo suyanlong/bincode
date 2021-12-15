@@ -249,7 +249,7 @@ fn deserializing_errors() {
         _ => panic!(),
     }
 
-    let invalid_str = vec![1, 0, 0, 0, 0, 0, 0, 0, 0xFF];
+    let invalid_str = vec![1, 0, 0, 0, 0xFF];
 
     match *deserialize::<String>(&invalid_str[..]).unwrap_err() {
         ErrorKind::InvalidUtf8Encoding(_) => {}
@@ -342,12 +342,12 @@ fn too_big_serialize() {
 
     assert!(DefaultOptions::new()
         .with_fixint_encoding()
-        .with_limit(LEN_SIZE + 4)
+        .with_limit(4 + 4)
         .serialize(&"abcde")
         .is_err());
     assert!(DefaultOptions::new()
         .with_fixint_encoding()
-        .with_limit(LEN_SIZE + 5)
+        .with_limit(4 + 5)
         .serialize(&"abcde")
         .is_ok());
 }
@@ -360,10 +360,10 @@ fn test_serialized_size() {
     assert!(serialized_size(&0u64).unwrap() == 8);
 
     // length isize stored as u64
-    assert!(serialized_size(&"").unwrap() == LEN_SIZE);
-    assert!(serialized_size(&"a").unwrap() == LEN_SIZE + 1);
+    assert!(serialized_size(&"").unwrap() == 4);
+    assert!(serialized_size(&"a").unwrap() == 4 + 1);
 
-    assert!(serialized_size(&vec![0u32, 1u32, 2u32]).unwrap() == LEN_SIZE + 3 * (4));
+    assert!(serialized_size(&vec![0u32, 1u32, 2u32]).unwrap() == 4 + 3 * (4));
 }
 
 #[test]
@@ -407,7 +407,7 @@ fn test_serialized_size_bounded() {
             .with_limit(8)
             .serialized_size(&"")
             .unwrap()
-            == LEN_SIZE
+            == 4
     );
     assert!(
         DefaultOptions::new()
@@ -415,7 +415,7 @@ fn test_serialized_size_bounded() {
             .with_limit(8 + 1)
             .serialized_size(&"a")
             .unwrap()
-            == LEN_SIZE + 1
+            == 4 + 1
     );
     assert!(
         DefaultOptions::new()
@@ -423,7 +423,7 @@ fn test_serialized_size_bounded() {
             .with_limit(LEN_SIZE + 3 * 4)
             .serialized_size(&vec![0u32, 1u32, 2u32])
             .unwrap()
-            == LEN_SIZE + 3 * 4
+            == 4 + 3 * 4
     );
     // Below
     assert!(DefaultOptions::new()
@@ -448,17 +448,17 @@ fn test_serialized_size_bounded() {
         .is_err());
     assert!(DefaultOptions::new()
         .with_fixint_encoding()
-        .with_limit(7)
+        .with_limit(3)
         .serialized_size(&"")
         .is_err());
     assert!(DefaultOptions::new()
         .with_fixint_encoding()
-        .with_limit(8 + 0)
+        .with_limit(4 + 0)
         .serialized_size(&"a")
         .is_err());
     assert!(DefaultOptions::new()
         .with_fixint_encoding()
-        .with_limit(8 + 3 * 4 - 1)
+        .with_limit(4 + 3 * 4 - 1)
         .serialized_size(&vec![0u32, 1u32, 2u32])
         .is_err());
 }
